@@ -1,0 +1,10 @@
+const express = require("express");
+const router = express.Router();
+
+const {
+  getRecentActivities,
+} = require("../controllers/activityController");
+
+router.get("/recent", getRecentActivities);
+
+module.exports = router;

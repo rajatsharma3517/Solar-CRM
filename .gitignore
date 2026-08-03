@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Secret / sensitive files
+.env
+.env.*
+
+# Build folders
+dist/
+build/
+
+# Logs
+*.log
+
+# User uploaded files
+server/uploads/
