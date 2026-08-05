@@ -1,99 +1,127 @@
 import { useState } from "react";
-import {
-  User,
-  Lock,
-  Eye,
-  EyeOff,
-  ArrowRight,
-} from "lucide-react";
+import { User, Lock, Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  // Form data
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  // Show / hide password
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Remember me
-  const [rememberMe, setRememberMe] = useState(false);
-
-  // Temporary submit function
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    console.log("Username:", username);
-    console.log("Password:", password);
-    console.log("Remember me:", rememberMe);
+    setError("");
 
-    // Backend login API baad mein yahan connect karenge
+    if (!username.trim() || !password.trim()) {
+      setError("Please enter username and password.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        "http://localhost:5000/api/auth/login",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            username: username.trim(),
+            password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Login failed.");
+        return;
+      }
+
+      // Save JWT
+      localStorage.setItem("token", data.token);
+
+      // Save logged-in user
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
+
+      console.log("Login successful:", data);
+
+      // Go to CRM Dashboard
+      navigate("/");
+    } catch (err) {
+      console.error("Login error:", err);
+
+      setError(
+        "Unable to connect to the server. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#F4F8FD] flex items-center justify-center px-6">
+    <div className="relative min-h-screen overflow-hidden bg-[#eef5ff] flex items-center justify-center px-6">
 
-      {/* Background Soft Glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Soft Background Glow */}
+      <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-blue-200/30 blur-3xl"></div>
 
-        <div className="absolute left-1/2 top-[-180px] h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-blue-200/40 blur-[140px]" />
-
-        <div className="absolute left-1/2 bottom-[-220px] h-[450px] w-[450px] -translate-x-1/2 rounded-full bg-sky-100/60 blur-[140px]" />
-
-      </div>
+      <div className="absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-sky-200/30 blur-3xl"></div>
 
       {/* Login Card */}
       <div
         className="
           relative
-          z-10
           w-full
           max-w-md
           overflow-hidden
-          rounded-[32px]
+          rounded-4xl
           border
-          border-white/80
+          border-white/70
           bg-white/60
-          p-10
           backdrop-blur-2xl
-          shadow-[0_25px_60px_rgba(15,23,42,0.10)]
+          shadow-[0_20px_60px_rgba(15,23,42,0.12)]
+          p-10
         "
       >
 
         {/* Glass Reflection */}
-        <div className="absolute -left-16 -top-20 h-52 w-52 rounded-full bg-white/60 blur-3xl pointer-events-none" />
+        <div className="pointer-events-none absolute -top-24 -left-24 h-60 w-60 rounded-full bg-white/60 blur-3xl"></div>
 
         {/* Logo */}
-        <div className="relative z-10 mb-6 flex justify-center">
+        <div className="relative z-10 flex justify-center mb-6">
 
-          <div
-            className="
-              flex
-              h-16
-              w-16
-              items-center
-              justify-center
-              rounded-2xl
-              bg-blue-600
-              shadow-lg
-              shadow-blue-300/40
-            "
-          >
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-300/40">
+
             <span className="text-2xl text-white">
               ☀
             </span>
+
           </div>
 
         </div>
 
         {/* Heading */}
-        <div className="relative z-10 mb-8 text-center">
+        <div className="relative z-10 text-center mb-8">
 
           <h1 className="text-4xl font-bold tracking-tight text-slate-900">
             Solar CRM
           </h1>
 
           <p className="mt-3 text-gray-500">
-            Welcome back 👋
+            Welcome back. 👋
           </p>
 
           <p className="mt-1 text-sm text-gray-400">
@@ -102,16 +130,16 @@ export default function Login() {
 
         </div>
 
-        {/* Login Form */}
+        {/* Form */}
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleLogin}
           className="relative z-10"
         >
 
           {/* Username */}
           <div className="mb-5">
 
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
+            <label className="mb-2 block text-sm font-medium text-slate-700">
               Username
             </label>
 
@@ -125,8 +153,7 @@ export default function Login() {
                 bg-white/70
                 px-4
                 py-3.5
-                backdrop-blur-xl
-                transition-all
+                transition
                 duration-200
                 focus-within:border-blue-500
                 focus-within:bg-white
@@ -142,9 +169,12 @@ export default function Login() {
 
               <input
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter username"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setError("");
+                }}
                 autoComplete="username"
                 className="
                   ml-3
@@ -161,9 +191,9 @@ export default function Login() {
           </div>
 
           {/* Password */}
-          <div className="mb-4">
+          <div className="mb-5">
 
-            <label className="mb-2 block text-sm font-semibold text-slate-700">
+            <label className="mb-2 block text-sm font-medium text-slate-700">
               Password
             </label>
 
@@ -177,8 +207,7 @@ export default function Login() {
                 bg-white/70
                 px-4
                 py-3.5
-                backdrop-blur-xl
-                transition-all
+                transition
                 duration-200
                 focus-within:border-blue-500
                 focus-within:bg-white
@@ -194,9 +223,12 @@ export default function Login() {
 
               <input
                 type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError("");
+                }}
                 autoComplete="current-password"
                 className="
                   ml-3
@@ -208,23 +240,18 @@ export default function Login() {
                 "
               />
 
-              {/* Password Eye */}
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="
-                  ml-2
-                  shrink-0
-                  text-gray-400
-                  transition
-                  hover:text-slate-700
-                "
+                onClick={() =>
+                  setShowPassword(!showPassword)
+                }
+                className="ml-2 text-gray-400 transition hover:text-gray-600"
               >
 
                 {showPassword ? (
-                  <EyeOff size={20} />
+                  <EyeOff size={19} />
                 ) : (
-                  <Eye size={20} />
+                  <Eye size={19} />
                 )}
 
               </button>
@@ -233,74 +260,55 @@ export default function Login() {
 
           </div>
 
-          {/* Remember Me */}
-          <div className="mb-6 flex items-center justify-between">
+          {/* Error Message */}
+          {error && (
+            <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              {error}
+            </div>
+          )}
 
-            <label className="flex cursor-pointer items-center gap-2">
-
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="
-                  h-4
-                  w-4
-                  cursor-pointer
-                  rounded
-                  border-gray-300
-                  accent-blue-600
-                "
-              />
-
-              <span className="text-sm text-gray-500">
-                Remember me
-              </span>
-
-            </label>
-
-          </div>
-
-          {/* Sign In Button */}
+          {/* Login Button */}
           <button
             type="submit"
+            disabled={loading}
             className="
+              mt-2
               flex
               w-full
               items-center
               justify-center
-              gap-2
               rounded-2xl
               bg-blue-600
-              px-5
               py-3.5
-              font-semibold
+              font-medium
               text-white
               shadow-lg
               shadow-blue-200
-              transition-all
+              transition
               duration-200
               hover:bg-blue-700
-              hover:shadow-xl
               active:scale-[0.98]
+              disabled:cursor-not-allowed
+              disabled:opacity-70
             "
           >
 
-            Sign In
+            {loading ? (
+              <>
+                <LoaderCircle
+                  size={20}
+                  className="mr-2 animate-spin"
+                />
 
-            <ArrowRight size={19} />
+                Signing in...
+              </>
+            ) : (
+              "Sign In"
+            )}
 
           </button>
 
         </form>
-
-        {/* Footer */}
-        <div className="relative z-10 mt-7 text-center">
-
-          <p className="text-xs text-gray-400">
-            Secure Login • Solar CRM
-          </p>
-
-        </div>
 
       </div>
 

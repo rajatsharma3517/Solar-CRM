@@ -12,5 +12,7 @@ build/
 # Logs
 *.log
 
+server/scripts/hashPassword.js
+
 # User uploaded files
 server/uploads/
