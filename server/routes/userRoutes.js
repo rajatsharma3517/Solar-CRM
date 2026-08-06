@@ -11,6 +11,11 @@ const adminOnly =
 const {
   getUsers,
   addUser,
+  updateUserStatus,
+  resetUserPassword,
+  updateUser,
+  getUserAssignmentSummary,
+  reassignAndDeleteUser,
 } = require("../controllers/userController");
 
 
@@ -29,5 +34,19 @@ router.get("/", getUsers);
 // ADD NEW USER
 router.post("/", addUser);
 
+// ENABLE / DISABLE EMPLOYEE
+router.patch("/:id/status", updateUserStatus);
+
+// RESET EMPLOYEE PASSWORD
+router.patch("/:id/reset-password", resetUserPassword);
+
+// EDIT EMPLOYEE
+router.put("/:id", updateUser);
+
+// GET EMPLOYEE ASSIGNED LEADS / CUSTOMERS COUNT
+router.get("/:id/assignment-summary", getUserAssignmentSummary);
+
+// REASSIGN RECORDS AND DELETE EMPLOYEE
+router.delete("/:id/reassign", reassignAndDeleteUser);
 
 module.exports = router;

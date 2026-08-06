@@ -357,6 +357,7 @@ function Leads() {
                         setEditingCustomer(null);
                         setShowForm(false);
                     }}
+                    type="Lead"
                 />
             )}
 

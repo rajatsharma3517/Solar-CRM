@@ -467,6 +467,7 @@ function Customers() {
                         setShowForm(false);
 
                     }}
+                    type="Customer"
 
                 />
 

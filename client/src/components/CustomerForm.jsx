@@ -4,6 +4,7 @@ function CustomerForm({
   onSubmit,
   editingCustomer,
   cancelEdit,
+  type = "Customer",
 }) {
   const initialState = {
     name: "",
@@ -48,8 +49,8 @@ function CustomerForm({
     <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
       <h2 className="text-2xl font-bold mb-6">
         {editingCustomer
-          ? "Edit Customer"
-          : "Add New Customer"}
+          ? `Edit ${type}`
+          : `Add New ${type}`}
       </h2>
 
       <form
@@ -149,8 +150,8 @@ function CustomerForm({
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition"
           >
             {editingCustomer
-              ? "Update Customer"
-              : "Save Customer"}
+              ? `Update ${type}`
+              : `Add ${type}`}
           </button>
 
           {editingCustomer && (

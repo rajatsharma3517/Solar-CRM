@@ -141,5 +141,33 @@ export const getUsers = () =>
 export const addUser = (userData) =>
   API.post("/api/users", userData);
 
+export const updateUserStatus = (id, status) => {
+  return API.patch(`/api/users/${id}/status`, {
+    status,
+  });
+};
+
+export const resetUserPassword = (id, password) => {
+  return API.patch(`/api/users/${id}/reset-password`, {
+    password,
+  });
+};
+
+export const updateUser = (id, userData) =>
+  API.put(`/api/users/${id}`, userData);
+
+// GET EMPLOYEE ASSIGNMENT SUMMARY
+export const getUserAssignmentSummary = (id) =>
+  API.get(`/api/users/${id}/assignment-summary`);
+
+
+// REASSIGN RECORDS AND DELETE EMPLOYEE
+export const reassignAndDeleteUser = (id, reassignTo) =>
+  API.delete(`/api/users/${id}/reassign`, {
+    data: {
+      reassignTo: Number(reassignTo),
+    },
+  });
+
 
 export default API;
