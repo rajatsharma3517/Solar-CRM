@@ -100,7 +100,6 @@ Solar CRM was built to simplify customer and lead management for solar businesse
 
 ## 🔮 Future Improvements
 
-- Role-based Admin & Employee Management
 - Advanced Analytics and Reports
 - Notifications and Follow-up Reminders
 - Deployment with Cloud Database
